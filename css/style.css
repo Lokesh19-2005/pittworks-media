@@ -140,9 +140,9 @@ section{ position: relative; padding: var(--space-7) 0; }
     linear-gradient(180deg, #0c0c0c 0%, #111111 60%, #151310 100%);
   z-index:0; }
 .hero-bridge-line{ position:absolute; bottom:0; left:0; width:100%; height: 50%; z-index:1; }
-.hero-particles{ position:absolute; inset:0; z-index:1; }
-.particle{ position:absolute; border-radius:50%; background: var(--gold); opacity:.5; filter: blur(1px); animation: floatUp linear infinite; }
-@keyframes floatUp{ from{ transform: translateY(0); } to{ transform: translateY(-120vh); } }
+.hero-particles{ position:absolute; inset:0; z-index:1; contain: strict; }
+.particle{ position:absolute; border-radius:50%; background: var(--gold); opacity:.5; filter: blur(1px); animation: floatUp linear infinite; transform: translate3d(0,0,0); }
+@keyframes floatUp{ from{ transform: translate3d(0,0,0); } to{ transform: translate3d(0,-120vh,0); } }
 
 .hero-content{ position:relative; z-index:2; max-width: 980px; padding: 0 24px; }
 .hero-title{ font-family: var(--font-display); font-weight:400; letter-spacing: 1px; font-size: clamp(38px, 8vw, 96px); line-height: 1.02; margin: 20px 0 28px; color: var(--white); }
@@ -816,10 +816,10 @@ textarea:focus-visible {
    ============================================ */
 
 /* Hero stagger entrance */
-.hero-logo-wrap { animation: heroFloat 6s ease-in-out infinite; }
+.hero-logo-wrap { animation: heroFloat 6s ease-in-out infinite; transform: translate3d(0,0,0); }
 @keyframes heroFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translate3d(0,0,0); }
+  50% { transform: translate3d(0,-10px,0); }
 }
 
 /* Glowing pulse on hero logo */
@@ -850,10 +850,10 @@ textarea:focus-visible {
   100% { left: 200%; }
 }
 
-/* Why cards — tilt on hover + glow */
+/* Why cards — tilt on hover + glow (GPU accelerated) */
 .why-card {
-  transform-style: preserve-3d;
-  perspective: 800px;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
 }
 .why-card:hover {
   box-shadow: 0 20px 40px rgba(244,180,0,.1);

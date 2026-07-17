@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- Hero particles ---------- */
   const particleWrap = document.getElementById('particles');
   if (particleWrap) {
-    const NUM_PARTICLES = 24;
+    const NUM_PARTICLES = window.innerWidth < 768 ? 10 : 20;
     for (let i = 0; i < NUM_PARTICLES; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
@@ -448,68 +448,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ============================================
-// PREMIUM MOTION — HOME PAGE ENHANCEMENTS
+// PREMIUM MOTION — PERFORMANCE OPTIMIZED
 // ============================================
 
 (function() {
+  // Use requestAnimationFrame for all scroll-based animations (no jank)
+  let ticking = false;
+  let scrollY = 0;
+
   /* ---------- Nav hide/show on scroll ---------- */
   const nav = document.getElementById('nav');
-  if (nav) {
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      const current = window.scrollY;
-      if (current > 200 && current > lastScroll) {
-        nav.classList.add('nav-hidden');
-      } else {
-        nav.classList.remove('nav-hidden');
-      }
-      lastScroll = current;
-    });
-  }
+  let lastScroll = 0;
+  let navHidden = false;
 
   /* ---------- Parallax hero elements on scroll ---------- */
   const heroContent = document.querySelector('.hero-content');
   const heroBg = document.querySelector('.hero-bg');
-  if (heroContent && heroBg) {
-    window.addEventListener('scroll', () => {
-      const scroll = window.scrollY;
-      if (scroll < window.innerHeight) {
-        heroContent.style.transform = `translateY(${scroll * 0.3}px)`;
-        heroContent.style.opacity = 1 - (scroll / (window.innerHeight * 0.8));
-        heroBg.style.transform = `translateY(${scroll * 0.15}px)`;
-      }
-    });
+  const vh = window.innerHeight;
+
+  function onScroll() {
+    scrollY = window.scrollY;
+    if (!ticking) {
+      requestAnimationFrame(updateScroll);
+      ticking = true;
+    }
   }
 
-  /* ---------- 3D Tilt on why-cards ---------- */
+  function updateScroll() {
+    // Nav hide/show
+    if (nav) {
+      if (scrollY > 200 && scrollY > lastScroll + 5 && !navHidden) {
+        nav.classList.add('nav-hidden');
+        navHidden = true;
+      } else if (scrollY < lastScroll - 5 && navHidden) {
+        nav.classList.remove('nav-hidden');
+        navHidden = false;
+      }
+      lastScroll = scrollY;
+    }
+
+    // Parallax - GPU accelerated with will-change
+    if (heroContent && heroBg && scrollY < vh) {
+      const ratio = scrollY / vh;
+      heroContent.style.transform = `translate3d(0, ${scrollY * 0.25}px, 0)`;
+      heroContent.style.opacity = 1 - ratio * 1.2;
+      heroBg.style.transform = `translate3d(0, ${scrollY * 0.1}px, 0)`;
+    }
+
+    ticking = false;
+  }
+
+  // Passive scroll listener for best performance
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Set will-change hints for GPU layers
+  if (heroContent) heroContent.style.willChange = 'transform, opacity';
+  if (heroBg) heroBg.style.willChange = 'transform';
+
+  /* ---------- 3D Tilt on why-cards (throttled) ---------- */
   document.querySelectorAll('.why-card').forEach(card => {
+    let rafId = null;
     card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = (y - centerY) / centerY * -5;
-      const rotateY = (x - centerX) / centerX * 5;
-      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+      if (rafId) return; // skip if already scheduled
+      rafId = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `perspective(800px) rotateX(${y * -6}deg) rotateY(${x * 6}deg) translateY(-6px) translate3d(0,0,0)`;
+        rafId = null;
+      });
     });
     card.addEventListener('mouseleave', () => {
+      cancelAnimationFrame(rafId);
+      rafId = null;
       card.style.transform = '';
     });
   });
 
-  /* ---------- Button ripple position ---------- */
+  /* ---------- Button ripple position (no reflow) ---------- */
   document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('mousemove', (e) => {
       const rect = btn.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      btn.style.setProperty('--ripple-x', x + '%');
-      btn.style.setProperty('--ripple-y', y + '%');
-    });
+      btn.style.setProperty('--ripple-x', ((e.clientX - rect.left) / rect.width * 100) + '%');
+      btn.style.setProperty('--ripple-y', ((e.clientY - rect.top) / rect.height * 100) + '%');
+    }, { passive: true });
   });
 
-  /* ---------- Smooth number reveal for stats ---------- */
+  /* ---------- Stat items glow on reveal ---------- */
   document.querySelectorAll('.stat-item').forEach(item => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -522,20 +547,10 @@ document.addEventListener('DOMContentLoaded', () => {
     observer.observe(item);
   });
 
-  /* ---------- Text split animation for CTA heading ---------- */
-  const ctaHeading = document.querySelector('.cta-banner h2');
-  if (ctaHeading && !ctaHeading.dataset.split) {
-    ctaHeading.dataset.split = 'true';
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-    observer.observe(ctaHeading);
-  }
+  /* ---------- Remove will-change after animations settle ---------- */
+  setTimeout(() => {
+    if (heroContent) heroContent.style.willChange = 'auto';
+    if (heroBg) heroBg.style.willChange = 'auto';
+  }, 3000);
 
 })();
