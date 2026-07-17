@@ -99,7 +99,7 @@
   <!-- HERO -->
   <section class="hero" id="hero">
     <div class="hero-bg">
-      <div class="hero-particles" id="particles"></div>
+      <div class="hero-icons-float" id="heroIcons"></div>
       <svg class="hero-bridge-line" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMax slice">
         <path d="M60 320 A420 340 0 0 1 940 320" fill="none" stroke="#F4B400" stroke-width="2" opacity="0.35"/>
       </svg>
@@ -194,21 +194,22 @@
     </div>
   </section>
 
-  <!-- FEATURED CLIENTS — FLOATING ICONS -->
-  <section class="clients-float" id="clients">
+  <!-- FEATURED CLIENTS — SCROLLING LOGOS -->
+  <section class="clients" id="clients">
     <div class="container">
       <p class="eyebrow reveal-up">FEATURED CLIENTS</p>
       <h2 class="section-title reveal-up">Trusted by brands that mean business.</h2>
     </div>
-    <div class="floating-brands">
-      <div class="brand-bubble reveal-up" style="--d:0s"><span>December Delights</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.05s"><span>NG Ghee</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.1s"><span>Bagara Biryani Cafe</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.15s"><span>MonoRo</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.2s"><span>Aaraa Couture</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.25s"><span>Hotel Vamshi International</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.3s"><span>Kurnool Oils</span></div>
-      <div class="brand-bubble reveal-up" style="--d:0.35s"><span>Chai Resto</span></div>
+    <div class="marquee-wrap">
+      <div class="marquee-track" id="marqueeTrack1"></div>
+      <div class="marquee-track" id="marqueeTrack2" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- PRICING STATEMENT -->
+  <section class="pricing-statement">
+    <div class="container">
+      <h2 class="reveal-up">Our prices are high —<br><span class="serif-em">just like our work.</span></h2>
     </div>
   </section>
 

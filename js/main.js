@@ -70,21 +70,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.15 });
   revealEls.forEach(el => io.observe(el));
 
-  /* ---------- Hero particles ---------- */
-  const particleWrap = document.getElementById('particles');
-  if (particleWrap) {
-    const NUM_PARTICLES = window.innerWidth < 768 ? 10 : 20;
-    for (let i = 0; i < NUM_PARTICLES; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      const size = Math.random() * 4 + 2;
-      p.style.width = size + 'px';
-      p.style.height = size + 'px';
-      p.style.left = Math.random() * 100 + '%';
-      p.style.bottom = (Math.random() * -20) + '%';
-      p.style.animationDuration = (Math.random() * 10 + 8) + 's';
-      p.style.animationDelay = (Math.random() * 8) + 's';
-      particleWrap.appendChild(p);
+  /* ---------- Hero floating production icons ---------- */
+  const iconWrap = document.getElementById('heroIcons');
+  if (iconWrap) {
+    const icons = ['🎬', '📷', '✂️', '💡', '📝', '🎥', '🌐', '🎞️', '📸', '🔊', '🎤', '💻'];
+    const NUM_ICONS = window.innerWidth < 768 ? 8 : 14;
+    for (let i = 0; i < NUM_ICONS; i++) {
+      const el = document.createElement('span');
+      el.className = 'hero-float-icon';
+      el.textContent = icons[i % icons.length];
+      el.style.left = Math.random() * 100 + '%';
+      el.style.bottom = (Math.random() * -30) + '%';
+      el.style.animationDuration = (Math.random() * 12 + 10) + 's';
+      el.style.animationDelay = (Math.random() * 10) + 's';
+      iconWrap.appendChild(el);
     }
   }
 
