@@ -445,3 +445,97 @@ document.addEventListener('DOMContentLoaded', () => {
   } // end if (form)
 
 }); // end DOMContentLoaded
+
+
+// ============================================
+// PREMIUM MOTION — HOME PAGE ENHANCEMENTS
+// ============================================
+
+(function() {
+  /* ---------- Nav hide/show on scroll ---------- */
+  const nav = document.getElementById('nav');
+  if (nav) {
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const current = window.scrollY;
+      if (current > 200 && current > lastScroll) {
+        nav.classList.add('nav-hidden');
+      } else {
+        nav.classList.remove('nav-hidden');
+      }
+      lastScroll = current;
+    });
+  }
+
+  /* ---------- Parallax hero elements on scroll ---------- */
+  const heroContent = document.querySelector('.hero-content');
+  const heroBg = document.querySelector('.hero-bg');
+  if (heroContent && heroBg) {
+    window.addEventListener('scroll', () => {
+      const scroll = window.scrollY;
+      if (scroll < window.innerHeight) {
+        heroContent.style.transform = `translateY(${scroll * 0.3}px)`;
+        heroContent.style.opacity = 1 - (scroll / (window.innerHeight * 0.8));
+        heroBg.style.transform = `translateY(${scroll * 0.15}px)`;
+      }
+    });
+  }
+
+  /* ---------- 3D Tilt on why-cards ---------- */
+  document.querySelectorAll('.why-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = (y - centerY) / centerY * -5;
+      const rotateY = (x - centerX) / centerX * 5;
+      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+
+  /* ---------- Button ripple position ---------- */
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      btn.style.setProperty('--ripple-x', x + '%');
+      btn.style.setProperty('--ripple-y', y + '%');
+    });
+  });
+
+  /* ---------- Smooth number reveal for stats ---------- */
+  document.querySelectorAll('.stat-item').forEach(item => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    observer.observe(item);
+  });
+
+  /* ---------- Text split animation for CTA heading ---------- */
+  const ctaHeading = document.querySelector('.cta-banner h2');
+  if (ctaHeading && !ctaHeading.dataset.split) {
+    ctaHeading.dataset.split = 'true';
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    observer.observe(ctaHeading);
+  }
+
+})();
